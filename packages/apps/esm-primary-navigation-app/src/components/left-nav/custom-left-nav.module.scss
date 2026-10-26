@@ -1,0 +1,474 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.customLeftNav {
+  position: fixed;
+  top: var(--omrs-topnav-height, 3rem);
+  left: 0;
+  bottom: 0;
+  background-color: $ui-01;
+  border-inline-end: 1px solid $color-gray-30;
+  transition: width 0.3s ease-in-out;
+  overflow-y: auto;
+  z-index: 1000;
+  // Hide scrollbar for Firefox
+  scrollbar-width: none;
+  
+  // Hide scrollbar for Chrome, Safari, and Opera
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &.collapsed {
+    width: 3rem; // 48px for icon rail
+    overflow-x: visible; // Allow tooltip to escape the nav boundary
+    overflow-y: visible; // Allow tooltip to escape vertically too
+  }
+
+  &.expanded {
+    width: 16rem; // 256px for full nav
+    overflow-x: hidden;
+  }
+}
+
+.navContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  // padding-top: 1rem; // Add top padding
+}
+
+// Style for nav links in collapsed mode (icon only)
+.collapsed {
+  :global(.cds--side-nav__link) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 2rem; // Tighter height like Carbon default (32px)
+    padding: 0 !important;
+    min-height: 2rem;
+    color: $text-02;
+    border: none;
+    text-decoration: none;
+    position: relative;
+    transition: background-color 0.11s ease-in-out;
+
+    &:focus,
+    &:hover {
+      background-color: #D9EDF4;
+    }
+
+    // Active state - show indicator on the side
+    &:global(.active-left-nav-link) {
+      background-color: #C5E3EE;
+      color: $ui-05;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 1.5rem; // Shorter indicator
+        background-color: var(--brand-01, $interactive-01);
+      }
+
+      svg {
+        fill: $ui-05;
+      }
+    }
+
+    // Style the menu wrapper to center icon and hide text
+    > span {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      gap: 0 !important;
+      
+      // Target all SVGs regardless of nesting and center them
+      svg {
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+        width: 1rem !important; // 16px icons
+        height: 1rem !important;
+        fill: $color-gray-70; // Bolder/darker icon color
+      }
+
+      // Hide all text elements (nested spans from dashboard extension)
+      > span {
+        display: none !important;
+      }
+    }
+
+    // Custom tooltip using data-tooltip attribute (no native browser tooltip)
+    &:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: layout.$spacing-03;
+      padding: layout.$spacing-02 layout.$spacing-03;
+      background-color: $ui-05;
+      color: $ui-02;
+      border-radius: 2px;
+      white-space: nowrap;
+      font-size: 0.875rem;
+      z-index: 1002;
+      pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  // Nav Group (Accordion) styling in collapsed mode
+  :global(.cds--accordion) {
+    width: 100%;
+    
+    // Add separator line before accordion (nav-group)
+    &::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1px;
+      background-color: $ui-03;
+      margin: layout.$spacing-02 0;
+    }
+  }
+
+  :global(.cds--accordion__item) {
+    border: none !important;
+    
+    // Force accordion to always be expanded in collapsed mode
+    &:not(.cds--accordion__item--active) {
+      :global(.cds--accordion__content) {
+        max-height: none !important;
+        display: block !important;
+        overflow: visible !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+    }
+  }
+
+  // Force accordion wrapper to be visible
+  :global(.cds--accordion__wrapper) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding-top:0 !important;
+    padding-bottom:0 !important;
+  }
+
+  // Hide the accordion heading (the expandable title bar) completely in collapsed mode
+  :global(.cds--accordion__heading) {
+    display: none !important;
+  }
+
+  // Show accordion content directly (submenu items as stacked icons)
+  :global(.cds--accordion__content) {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important; // Always show, don't collapse
+    height: auto !important;
+    
+    // Add separator after nav-group submenu items
+    // &::after {
+    //   content: '';
+    //   display: block;
+    //   width: 100%;
+    //   height: 1px;
+    //   background-color: $ui-03;
+    //   margin: layout.$spacing-02 0;
+    // }
+  }
+
+  // Make all accordion items always expanded in collapsed nav mode
+  :global(.cds--accordion__item) {
+    // Remove the height animation
+    :global(.cds--accordion__content) {
+      max-height: none !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    // Force expansion even when not active
+    &:not(.cds--accordion__item--active) {
+      :global(.cds--accordion__content) {
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        height: auto !important;
+      }
+    }
+  }
+
+  // Submenu items styling - same compact height for stacked icons
+  :global(.cds--accordion__content) {
+    // Make sure the container for submenu items is visible
+    > div {
+      display: block !important;
+      width: 100% !important;
+    }
+
+    // Force all children to be visible
+    > * {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    :global(.cds--accordion__wrapper) {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    
+    :global(.cds--side-nav__link) {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 2rem !important;
+      min-height: 2rem !important;
+      font-weight: 600;
+      opacity: 1 !important;
+      visibility: visible !important;
+      
+      // Ensure submenu icons and their containers are visible
+      > span {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        font-weight: 600;
+      
+        svg {
+          display: block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          fill: $color-gray-70 !important;
+          width: 1rem !important;
+          height: 1rem !important;
+          margin: 0 !important;
+          flex-shrink: 0 !important;
+        }
+        
+        // Hide text in submenu items too
+        > span {
+          display: none !important;
+        }
+      }
+    }
+    
+    // Also ensure divs wrapping the links are visible
+    div {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  }
+}
+
+// Style for nav links in expanded mode (icon + text)
+.expanded {
+  :global(.cds--side-nav__link) {
+    display: flex;
+    align-items: center;
+    height: 2rem;
+    padding: 0 1rem;
+    min-height: 2rem;
+    color: $text-02;
+    border: none;
+    text-decoration: none;
+    transition: background-color 0.11s ease-in-out;
+    @include type.type-style('body-compact-01');
+    font-weight: 600 !important; // After the mixin so it takes precedence
+
+    &:focus,
+    &:hover {
+      background-color: #D9EDF4;
+    }
+
+    // Active state
+    &:global(.active-left-nav-link) {
+      color: $ui-05;
+      border-inline-start: 3px solid var(--brand-01, $interactive-01);
+      background-color: #C5E3EE;
+      outline: none;
+      padding-inline-start: calc(1rem - 3px);
+
+      svg {
+        fill: $ui-05;
+      }
+    }
+
+    // Layout for icon and text
+    > span {
+      display: flex;
+      align-items: center;
+      gap: layout.$spacing-03;
+      width: 100%;
+
+      svg {
+        flex-shrink: 0;
+        width: 1rem;
+        height: 1rem;
+      }
+
+      span {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+        font-weight: 600; // Make text bolder
+      }
+    }
+  }
+
+  // Nav Group (Accordion) styling in expanded mode
+  :global(.cds--accordion) {
+    width: 100%;
+  }
+
+  :global(.cds--accordion__item) {
+    border: none !important;
+  }
+
+  :global(.cds--accordion__wrapper) {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+  }
+
+  // Accordion heading - the group title
+  :global(.cds--accordion__heading) {
+    height: 2rem;
+    min-height: 2rem;
+    padding: 0 1rem !important;
+    margin: layout.$spacing-03 0 layout.$spacing-02 0 !important;
+    background-color: transparent;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important; // Make it clear it's clickable
+    transition: background-color 0.11s ease-in-out;
+
+    &:hover {
+      background-color: $ui-02 !important;
+    }
+
+    // Show subtle chevron icon for expand/collapse
+    :global(.cds--accordion__arrow) {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
+      height: 1rem;
+      margin-right: layout.$spacing-02;
+      fill: $text-03;
+      transition: transform 0.11s ease-in-out;
+      
+      svg {
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+    }
+
+    // Rotate chevron when expanded
+    &:global([aria-expanded="true"]) {
+      :global(.cds--accordion__arrow) {
+        transform: rotate(90deg);
+      }
+    }
+
+    // Group title styling
+    :global(.cds--accordion__title) {
+      color: $text-03; // Lighter color for group headers
+      font-size: 0.75rem; // Smaller font for headers
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      padding: 0 !important;
+      margin: 0 !important;
+      line-height: 1;
+    }
+  }
+
+  // Accordion content (submenu items)
+  :global(.cds--accordion__content) {
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important; // Always show
+    max-height: none !important;
+    overflow: visible !important;
+    height: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    
+    // Force the content to be visible
+    &[hidden] {
+      display: block !important;
+      height: auto !important;
+    }
+  }
+
+  // Force all accordion items to be expanded
+  :global(.cds--accordion__item) {
+    :global(.cds--accordion__content) {
+      display: block !important;
+      max-height: none !important;
+      overflow: visible !important;
+      opacity: 1 !important;
+    }
+  }
+
+  // Submenu items - indented
+  :global(.cds--accordion__content) {
+    :global(.cds--side-nav__link) {
+      height: 2rem;
+      min-height: 2rem;
+    }
+  }
+}
+
+
+
+/* Tablet responsiveness */
+:global(.omrs-breakpoint-lt-desktop) {
+  .customLeftNav {
+    &.mobilePanel {
+      // Mobile panel is an overlay slide-out
+      position: fixed;
+      width: 16rem; // Always full sidebar on mobile
+      height: 100vh;
+      top: var(--omrs-topnav-height, 3rem); // Start below the top nav
+      left: 0;
+      z-index: 1000; // Below top nav (which is typically 8000+)
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+      
+      // Override collapsed/expanded widths on mobile
+      &.collapsed,
+      &.expanded {
+        width: 16rem;
+      }
+    }
+  }
+
+  .expanded {
+    :global(.cds--side-nav__link) {
+      height: layout.$spacing-09;
+      min-height: layout.$spacing-09;
+    }
+  }
+}

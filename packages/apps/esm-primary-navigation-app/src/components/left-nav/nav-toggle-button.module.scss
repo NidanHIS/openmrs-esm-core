@@ -1,0 +1,58 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/layout';
+
+.toggleButton {
+  position: fixed;
+  top: calc(var(--omrs-topnav-height, 3rem) + 1rem);
+  left: 3rem; // Default collapsed position
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: $ui-01;
+  border: 1px solid $ui-03;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: left 0.3s ease-in-out, transform 0.11s ease-in-out;
+  z-index: 1001; // Above the nav
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateX(-50%);
+
+  &:hover {
+    background-color: $ui-02;
+    border-color: $ui-04;
+    transform: translateX(-50%) scale(1.1);
+  }
+
+  &:focus {
+    // outline: 2px solid $focus;
+    outline-offset: 2px;
+  }
+
+  &:active {
+    background-color: $ui-03;
+    transform: translateX(-50%) scale(0.95);
+  }
+
+  svg {
+    // fill: $text-01;
+  }
+}
+
+// Adjust position when expanded
+:global(body.omrs-left-nav-expanded) .toggleButton {
+  left: 16rem; // Position at edge of expanded nav
+}
+
+:global(body.omrs-left-nav-collapsed) .toggleButton {
+  left: 3rem; // Position at edge of collapsed nav
+}
+
+// Hide on mobile/tablet
+:global(.omrs-breakpoint-lt-desktop) {
+  .toggleButton {
+    display: none;
+  }
+}
+

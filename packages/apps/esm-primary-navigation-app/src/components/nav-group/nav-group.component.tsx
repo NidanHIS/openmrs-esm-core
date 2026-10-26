@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionItem } from '@carbon/react';
 import { ComponentContext, ExtensionSlot, useConfig, Type } from '@openmrs/esm-framework/src/internal';
@@ -18,8 +18,8 @@ export const navGroupConfigSchema = {
   },
   isExpanded: {
     _type: Type.Boolean,
-    _description: 'The boolean to determine whether the nav group is expanded or not.',
-    _default: false,
+    _description: 'The boolean to determine whether the nav group is expanded or not by default.',
+    _default: true, // Changed default to true
   },
 };
 
@@ -35,13 +35,19 @@ interface NavGroupProps {
 
 export function NavGroup({ basePath }: NavGroupProps) {
   const componentContext = useContext(ComponentContext);
-
   const { t } = useTranslation();
-  const { title, isExpanded, slotName } = useConfig<NavGroupConfig>();
+  const { title, isExpanded: defaultExpanded, slotName } = useConfig<NavGroupConfig>();
+  
+  // Use local state to control expansion, defaulting to config value
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
 
   return (
     <Accordion>
-      <AccordionItem open={isExpanded} title={t(title)}>
+      <AccordionItem 
+        open={isExpanded} 
+        title={t(title)}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
         <ExtensionSlot
           name={slotName ?? `nav-group-${title}`}
           state={{ basePath, moduleName: componentContext.extension?.extensionSlotModuleName }}

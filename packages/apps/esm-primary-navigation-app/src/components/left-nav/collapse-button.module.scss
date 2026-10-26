@@ -1,0 +1,43 @@
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/layout';
+
+.collapseButton {
+  position: absolute;
+  top: layout.$spacing-03;
+  right: layout.$spacing-03;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.11s ease-in-out;
+  z-index: 1;
+
+  &:hover {
+    background-color: $ui-02;
+  }
+
+  &:focus {
+    // outline: 2px solid $focus;
+    outline-offset: -2px;
+  }
+
+  &:active {
+    background-color: $ui-03;
+  }
+
+  svg {
+    // fill: $text-01;
+  }
+}
+
+// Hide on mobile/tablet
+:global(.omrs-breakpoint-lt-desktop) {
+  .collapseButton {
+    display: none;
+  }
+}
