@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navbar from './components/navbar/navbar.component';
 import styles from './root.scss';
+import './components/left-nav/left-nav-global.scss';
 
 const Root: React.FC = () => {
   return (

@@ -1,0 +1,35 @@
+// Global styles to adjust main content area when left nav is visible
+
+// Desktop - adjust margin for main content area
+@media (min-width: 1024px) {
+  body.omrs-left-nav-expanded {
+    #omrs-apps-container {
+      margin-left: 16rem;
+      transition: margin-left 0.3s ease-in-out;
+    }
+  }
+
+  body.omrs-left-nav-collapsed {
+    #omrs-apps-container {
+      margin-left: 3rem;
+      transition: margin-left 0.3s ease-in-out;
+    }
+  }
+
+  // Reset margin when nav is hidden or not present
+  body:not(.omrs-left-nav-expanded):not(.omrs-left-nav-collapsed) {
+    #omrs-apps-container {
+      margin-left: 0;
+    }
+  }
+}
+
+// Mobile/Tablet - no margin adjustments needed
+@media (max-width: 1023px) {
+  body.omrs-left-nav-expanded,
+  body.omrs-left-nav-collapsed {
+    #omrs-apps-container {
+      margin-left: 0;
+    }
+  }
+}

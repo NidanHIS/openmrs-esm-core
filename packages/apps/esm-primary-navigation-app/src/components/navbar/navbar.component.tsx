@@ -24,9 +24,21 @@ const HeaderItems: React.FC = () => {
   const navMenuItems = useAssignedExtensions(slotName);
   const isActivePanel = useCallback((panelName: string) => activeHeaderPanel === panelName, [activeHeaderPanel]);
 
-  const togglePanel = useCallback((panelName: string) => {
-    setActiveHeaderPanel((activeHeaderPanel) => (activeHeaderPanel === panelName ? null : panelName));
-  }, []);
+  // Track whether the collapsible nav is expanded (only used when mode === 'collapsed')
+  const [isNavExpanded, setIsNavExpanded] = useState(() => {
+    try {
+      return localStorage.getItem('openmrs:leftNavExpanded') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const togglePanel = useCallback(
+    (panelName: string) => {
+      setActiveHeaderPanel((activeHeaderPanel) => (activeHeaderPanel === panelName ? null : panelName));
+    },
+    [],
+  );
 
   const hidePanel = useCallback(
     (panelName: string) => () => {
@@ -35,8 +47,25 @@ const HeaderItems: React.FC = () => {
     [],
   );
 
+  const toggleNavExpanded = useCallback(() => {
+    setIsNavExpanded((prev) => {
+      const newValue = !prev;
+      try {
+        localStorage.setItem('openmrs:leftNavExpanded', String(newValue));
+      } catch (e) {
+        console.warn('Failed to save nav expanded state', e);
+      }
+      return newValue;
+    });
+  }, []);
+
+  // Show hamburger:
+  // - On mobile/tablet: always (when nav exists)
+  // - On desktop: only when mode is 'collapsed'
   const showHamburger = useMemo(
-    () => (!isDesktop(layout) || mode === 'collapsed') && mode !== 'hidden' && navMenuItems.length > 0,
+    () => navMenuItems.length > 0 && (
+      !isDesktop(layout) || mode === 'collapsed'
+    ),
     [navMenuItems.length, layout, mode],
   );
 
@@ -45,15 +74,25 @@ const HeaderItems: React.FC = () => {
       <Header aria-label="OpenMRS" className={styles.topNavHeader}>
         {showHamburger && (
           <HeaderMenuButton
-            aria-label="Open menu"
+            aria-label={
+              !isDesktop(layout) 
+                ? (isActivePanel('sideMenu') ? 'Close menu' : 'Open menu')
+                : (isNavExpanded ? 'Collapse navigation' : 'Expand navigation')
+            }
             isCollapsible
             className={styles.headerMenuButton}
             onClick={() => {
-              togglePanel('sideMenu');
+              if (!isDesktop(layout)) {
+                // Mobile/Tablet: Toggle the slide-out panel
+                togglePanel('sideMenu');
+              } else {
+                // Desktop in collapsed mode: Toggle expanded state
+                toggleNavExpanded();
+              }
             }}
             onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
-            isActive={isActivePanel('sideMenu')}
+            isActive={!isDesktop(layout) ? isActivePanel('sideMenu') : isNavExpanded}
           />
         )}
         <ConfigurableLink to={config.logo.link}>
@@ -81,7 +120,11 @@ const HeaderItems: React.FC = () => {
             state={{ isActivePanel, togglePanel, hidePanel }}
             className={styles.topNavActionsSlot}
           />
-          <SideMenuPanel hidePanel={hidePanel('sideMenu')} expanded={isActivePanel('sideMenu')} />
+          <SideMenuPanel 
+            hidePanel={hidePanel('sideMenu')} 
+            expanded={isActivePanel('sideMenu')} 
+            isNavExpanded={isNavExpanded}
+          />
           <NotificationsMenuPanel expanded={isActivePanel('notificationsMenu')} />
         </HeaderGlobalBar>
       </Header>
