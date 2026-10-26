@@ -34,21 +34,76 @@
 
 .container {
   display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  flex-direction: row;
+  height: 100vh;
+  width: 100%;
+}
+
+.leftPane {
+  flex: 6;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0, 40, 85, 0.28),
+        rgba(0, 40, 85, 0.28));
+    z-index: 2;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--login-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    transform: scale(1.03);
+    transition: transform .4s ease;
+  }
+
+}
+
+.rightPane {
+  flex: 4;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  min-height: calc(100vh - var(--omrs-navbar-height));
-}
+  background-color: #ffffff;
+  border-left: 1px solid #e8e8e8;
+  box-shadow: none;
 
-.containerWithImage {
-  background-image: var(--login-bg-image);
-  background-size: cover;
-  background-position: center;
-}
+  >div:nth-last-child(2) {
+    position: absolute;
+    bottom: 4.5rem;
+    font-size: 0.65rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-.containerWithColor {
-  background-color: var(--login-bg-color);
+  >div:last-child {
+    position: absolute;
+    bottom: 2rem;
+
+    img {
+      height: 2rem;
+      object-fit: contain;
+    }
+  }
 }
 
 .center {
@@ -56,13 +111,12 @@
 }
 
 .logo {
-  margin-bottom: layout.$spacing-08;
-  height: layout.$spacing-11;
-  width: 16rem;
+  width: 22rem;
 }
 
 .logoImg {
-  margin-bottom: layout.$spacing-09;
+  margin-bottom: 1.5rem;
+  width: 22rem;
   max-width: 100%;
 }
 
@@ -94,14 +148,36 @@
 }
 
 .loginCard {
-  border-radius: 0;
-  border: 1px solid $ui-03;
-  background-color: $ui-02;
-  width: 23rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 30rem;
   padding: layout.$spacing-08;
-  border-radius: layout.$spacing-03;
   position: relative;
   min-height: fit-content;
+  background-color: transparent;
+  border: none;
+
+  h6 {
+    color: #1a569d;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: layout.$spacing-10;
+    margin-top: -1rem;
+  }
+
+  :global(.cds--btn) {
+    max-width: 30rem;
+  }
+}
+
+.leftPane::after {
+  transition: transform .5s ease;
+}
+
+.leftPane:hover::after {
+  transform: scale(1.05);
 }
 
 .inputGroup {
@@ -109,16 +185,45 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  width: 18rem;
+  width: 24rem;
   gap: layout.$spacing-05;
 
   :global(.cds--text-input) {
     height: layout.$spacing-09;
     @extend .label01;
+    background-color: #f4f4f4;
+    border: none;
+    border-bottom: 1px solid #dcdcdc;
+    padding-left: 2.5rem;
+    background-repeat: no-repeat;
+    background-position: 1rem center;
+    background-size: 1rem;
+
+    &:focus {
+      outline: 2px solid #0f62fe;
+      outline-offset: -2px;
+    }
+  }
+
+  // User icon for username input
+  :global(#username) {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="%23666666"><path d="M16 2a7 7 0 1 0 7 7 7 7 0 0 0-7-7zm0 12a5 5 0 1 1 5-5 5 5 0 0 1-5 5zm11 16h-2v-3a6 6 0 0 0-6-6h-6a6 6 0 0 0-6 6v3H5v-3a8 8 0 0 1 8-8h6a8 8 0 0 1 8 8z"/></svg>');
+  }
+
+  // Lock icon for password input
+  :global(#password) {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="%23666666"><path d="M24 12h-1v-2c0-3.859-3.141-7-7-7s-7 3.141-7 7v2H8c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V14c0-1.103-.897-2-2-2zm-13-2c0-2.757 2.243-5 5-5s5 2.243 5 5v2H11v-2zm13 16H8V14h16v14z"/><circle cx="16" cy="21" r="2"/></svg>');
+  }
+
+  :global(.cds--label) {
+    color: #666;
+    margin-bottom: 0.25rem;
+    align-self: flex-start;
+    width: 100%;
   }
 
   :global(.cds--text-input__field-outer-wrapper) {
-    width: 18rem;
+    width: 24rem;
   }
 
   &:not(:last-child) {
@@ -128,7 +233,7 @@
 
 .continueButton {
   margin-top: layout.$spacing-06;
-  width: 18rem;
+  width: 24rem;
 }
 
 .backButtonDiv {
@@ -165,4 +270,53 @@
   display: flex;
   flex-direction: column;
   gap: layout.$spacing-03;
+}
+
+// Responsive adjustments for mobile and smaller tablets
+@media (max-width: 768px) {
+  .leftPane {
+    display: none;
+  }
+
+  .rightPane {
+    flex: 1 1 100%;
+    border-radius: 0;
+    box-shadow:
+      -18px 0 36px rgba(0, 0, 0, .05);
+  }
+
+  .loginCard {
+    width: 100%;
+    padding: layout.$spacing-05;
+
+    :global(.cds--btn) {
+      max-width: 100%;
+    }
+  }
+
+  .inputGroup {
+    width: 80vw;
+
+    :global(.cds--text-input__field-outer-wrapper) {
+      width: 80vw;
+    }
+  }
+
+  .continueButton {
+    width: 100%;
+  }
+
+  .logo {
+    width: 80%;
+    max-width: 18rem;
+  }
+
+  .announcements,
+  .errorMessage,
+  .needHelp,
+  .backButtonDiv {
+    width: 100%;
+    max-width: 23rem;
+    padding: 0 layout.$spacing-05;
+  }
 }
